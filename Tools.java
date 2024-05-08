@@ -88,6 +88,11 @@ public class Tools {
         for (int i = 0; i < res.length; i++) {
             heuristicValue += res[i];
         }
+        // for (int i = 0; i < levels.length; i++) {
+        //     if (top(levels[i])*2>=levels.length) {
+        //         heuristicValue++;
+        //     }
+        // }
         return heuristicValue;
     }
     public static void print2DArray(int[][] array) {
