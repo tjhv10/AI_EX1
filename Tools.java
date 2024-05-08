@@ -162,7 +162,17 @@ public class Tools {
         Tools.print2DArray(state);
         return state;
     }
-    
+    public static boolean arraysEqual(int[] arr1, int[] arr2) {
+        // Check each element of the arrays
+        for (int i = 0; i < arr1.length; i++) {
+            if (arr1[i] != arr2[i]) {
+                return false; // Arrays are not equal if any elements differ
+            }
+        }
+
+        // Arrays are equal if all elements are equal
+        return true;
+    }
     // Function to randomly shuffle the state while ensuring valid moves
     private static void shuffleState(Container c) {
         Random rand = new Random();
