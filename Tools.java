@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.HashSet;
 
 
@@ -24,11 +26,11 @@ public class Tools {
         return arr[0]!=-1;
     }
     // Check if a move is valid on the game board
-    public static boolean isValidMove(int i1,int i2,Container c1) {
-        if (top(c1.getLevels()[i1])==-1) {
+    public static boolean isValidMove(int i1,int i2,int[][] c1) {
+        if (top(c1[i1])==-1) {
             return false;
         }
-        return top(c1.getLevels()[i2])==-1||(c1.getLevels()[i1][top(c1.getLevels()[i1])]==c1.getLevels()[i2][top(c1.getLevels()[i2])]&&!full(c1.getLevels()[i2]));
+        return top(c1[i2])==-1||(c1[i1][top(c1[i1])]==c1[i2][top(c1[i2])]&&!full(c1[i2]));
     }
     // Perform the liquid transfer from one container to another
     public static void performMove(int fromContainer, int toContainer, Container container) {
@@ -79,7 +81,6 @@ public class Tools {
                         if(j==0)
                         break;
                     }
-                    // int top = top(levels[i]);
                     res[color] += j - top(levels[i]);
                 }
             }
@@ -89,6 +90,14 @@ public class Tools {
         }
         return heuristicValue;
     }
+    public static void print2DArray(int[][] array) {
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].length; j++) {
+                System.out.print(array[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
 
     // Generate neighboring states from the current state (container)
     public static List<Container> generateNeighbors(Container currentContainer) {
@@ -97,10 +106,11 @@ public class Tools {
         // Try pouring from each container to all other containers
         for (int from = 0; from < numContainers; from++) {
             for (int to = 0; to < numContainers; to++) {
-                if (isValidMove(from, to, currentContainer)&&from!=to) {
+                if (isValidMove(from, to, currentContainer.getLevels())&&from!=to) {
                     Container neighbor = new Container(currentContainer); // Create a copy of the current container
                     performMove(from, to, neighbor);
                     neighbor.setHeuristic(neighbor.getHeuristic());
+                    // System.out.println(neighbor);
                     neighbors.add(neighbor); // Add the new container to neighbors
                 }
             }
@@ -132,5 +142,44 @@ public class Tools {
             builder.append("Container ").append(i + 1).append(": [").append(levels[i][0]).append(", ").append(levels[i][1]).append("]\n");
         }
         return builder.toString();
+    }
+    public static int[][] generateState(int numContainers, int numColors) {
+        int[][] state = new int[numContainers][numColors];
+
+        // Fill the state with containers and colors
+        Arrays.fill(state[0], -1);
+        for (int i = 1; i < numContainers; i++) {
+            // Check if this array should be full of -1
+            Arrays.fill(state[i], i-2);
+        }
+        
+        Tools.print2DArray(state);
+        Container c = new Container(state);
+        // Randomly shuffle the state while ensuring valid moves
+        shuffleState(c);
+        System.out.println();
+        System.out.println();
+        Tools.print2DArray(state);
+        return state;
+    }
+    
+    // Function to randomly shuffle the state while ensuring valid moves
+    private static void shuffleState(Container c) {
+        Random rand = new Random();
+        
+        // Shuffle the state multiple times to ensure randomness
+        for (int i = 0; i < 1000; i++) {
+            int fromContainer = rand.nextInt(c.getLevels().length);
+            int toContainer = rand.nextInt(c.getLevels().length);
+            
+            // Check if the move is valid
+            // if (Tools.isValidMove(fromContainer, toContainer, c.getLevels())) {
+            if(fromContainer!=toContainer){
+                System.out.println(fromContainer);
+                System.out.println(toContainer);
+                Tools.performMove(fromContainer, toContainer, c);
+                print2DArray(c.getLevels());
+            }
+        }
     }
 }
