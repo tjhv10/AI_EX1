@@ -1,9 +1,8 @@
 import java.util.*;
 
 public class AStarPuzzleSolver{
-
     // Method to solve the puzzle using A* algorithm
-    public Container solvePuzzle(Container initialContainer) {
+    public void solvePuzzle(Container initialContainer) {
         // Initialize data structures for open and closed sets
         Hashtable<Integer, Container> openSet = new Hashtable<>();
         Set<String> closedSet = new HashSet<>();
@@ -15,8 +14,9 @@ public class AStarPuzzleSolver{
             Container currentContainer = getMinCostContainer(openSet);            
             // Check if the current state is the goal state
             if (Tools.isGoalState(currentContainer)) {
-                System.out.println("amazing");
-                return currentContainer;
+                System.out.println("Puzzle has been solved!");
+                // System.out.println(currentContainer);
+                return;
             }
             // Remove the current state from the open set and mark it as visited in the closed set
             String stateHash = currentContainer.toString();
@@ -26,15 +26,11 @@ public class AStarPuzzleSolver{
             closedSet.add(stateHash);
             openSet.remove(currentContainer.hashCode());
             // Generate neighbors and update the open set
-            System.out.println("new------------");
-            System.out.println(currentContainer);
-            System.out.println("neighbors:");
             List<Container> neighbors = Tools.generateNeighbors(currentContainer);
             neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
             updateOpenSet(openSet, closedSet, neighbors);
         }
-        System.out.println("null");
-        return null;
+        System.out.println("No solution.");
     }
     private void updateOpenSet(Hashtable<Integer, Container> openSet, Set<String> closedSet, List<Container> neighbors) {
         for (Container neighborContainer : neighbors) {
@@ -46,7 +42,6 @@ public class AStarPuzzleSolver{
             }
         }
     }
-
     // Helper method to get the container with the minimum total cost from the open set
     private Container getMinCostContainer(Hashtable<Integer, Container> openSet) {
         Container minContainer = null;

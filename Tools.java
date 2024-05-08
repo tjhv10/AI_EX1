@@ -4,7 +4,6 @@ import java.util.HashSet;
 
 
 public class Tools {
-
     public static int top(int[] arr)
     {
         boolean flag= false;
@@ -31,7 +30,6 @@ public class Tools {
         }
         return top(c1.getLevels()[i2])==-1||(c1.getLevels()[i1][top(c1.getLevels()[i1])]==c1.getLevels()[i2][top(c1.getLevels()[i2])]&&!full(c1.getLevels()[i2]));
     }
-
     // Perform the liquid transfer from one container to another
     public static void performMove(int fromContainer, int toContainer, Container container) {
         int[][] levels = container.getLevels();
@@ -41,12 +39,10 @@ public class Tools {
             levels[toContainer][levels[toContainer].length-1] = color;
         }
         else{
-            System.out.println(top(levels[toContainer]));
-            levels[toContainer][top(levels[toContainer])] = color;
+            levels[toContainer][top(levels[toContainer])-1] = color;
         }
         container.setLevels(levels);
     }
-
     // Check if the containers are in the goal state
     public static boolean isGoalState(Container c) {
         int cur;
@@ -105,7 +101,6 @@ public class Tools {
                     Container neighbor = new Container(currentContainer); // Create a copy of the current container
                     performMove(from, to, neighbor);
                     neighbor.setHeuristic(neighbor.getHeuristic());
-                    System.out.println(neighbor); // Perform the move
                     neighbors.add(neighbor); // Add the new container to neighbors
                 }
             }
