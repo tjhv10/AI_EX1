@@ -35,6 +35,7 @@ public class AStarPuzzleSolver {
             openSet.remove(currentContainer.hashCode());
             // Generate neighbors and update the open set
             List<Container> neighbors = Tools.generateNeighbors(currentContainer);
+            // System.out.println(neighbors.size());
             neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
             updateOpenSet(openSet, closedSet, neighbors);
             // Store parent-child relationship for backtracking

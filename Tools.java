@@ -34,15 +34,18 @@ public class Tools {
     public static void performMove(int fromContainer, int toContainer, Container container) {
         int[][] levels = container.getLevels();
         int color = levels[fromContainer][top(levels[fromContainer])];
-        levels[fromContainer][top(levels[fromContainer])] =-1;
-        if (top(levels[toContainer])==-1) {
-            levels[toContainer][levels[toContainer].length-1] = color;
-        }
-        else{
-            levels[toContainer][top(levels[toContainer])-1] = color;
+        while (top(levels[fromContainer])!=-1&&levels[fromContainer][top(levels[fromContainer])]==color&&!full(levels[toContainer])) {
+            levels[fromContainer][top(levels[fromContainer])] =-1;
+            if (top(levels[toContainer])==-1) {
+                levels[toContainer][levels[toContainer].length-1] = color;
+            }
+            else{
+                levels[toContainer][top(levels[toContainer])-1] = color;
+            }
         }
         container.setLevels(levels);
     }
+    
     // Check if the containers are in the goal state
     public static boolean isGoalState(Container c) {
         int cur;
@@ -67,11 +70,10 @@ public class Tools {
     }
     public static int calculateHeuristic(int[][] levels) {
         int heuristicValue = 0;
-        int[] res = new int[numOfColores(levels)+2];
+        int[] res = new int[numOfColores(levels)];
         int color;
         for (int i = 0; i < levels.length; i++) {
             if (top(levels[i])!=-1) {
-                heuristicValue++;
                 for (int j = levels[i].length-1; j > top(levels[i]); j--) {
                     color = levels[i][j];
                     while (levels[i][j-1]==color) {
@@ -96,7 +98,12 @@ public class Tools {
             System.out.println();
         }
     }
-
+    public static void printArray(int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            System.out.print(array[i] + " ");
+        }
+        System.out.println();
+    }
     // Generate neighboring states from the current state (container)
     public static List<Container> generateNeighbors(Container currentContainer) {
         List<Container> neighbors = new ArrayList<>();
@@ -133,7 +140,6 @@ public class Tools {
     public static String containerToString(Container container) {
         StringBuilder builder = new StringBuilder();
         int[][] levels = container.getLevels();
-
         // Append the levels of each container
         for (int i = 0; i < levels.length; i++) {
             builder.append("Container ").append(i + 1).append(": [").append(levels[i][0]).append(", ").append(levels[i][1]).append("]\n");
