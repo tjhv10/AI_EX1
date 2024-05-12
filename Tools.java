@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashSet;
+import java.util.*;
 
 
 public class Tools {
@@ -156,5 +157,68 @@ public class Tools {
 
         return true;
     }
+// Helper method to output the solution path
+    public static void outputSolutionPath(Container goalContainer, Map<Container, Container> parentMap, long elapsedTime) {
+        List<String> path = new ArrayList<>();
+        Container current = goalContainer;
+        while (current != null) {
+            Container parent = parentMap.get(current);
+            if (parent != null) {
+                int[][] parentLevels = parent.getLevels();
+                int[][] currentLevels = current.getLevels();
+                int[] diffIndex = findDifferentLevelIndex(parentLevels, currentLevels);
+                String action = "Swap container " + diffIndex[0] + " with " + diffIndex[1];
+                path.add(action+"\n"+current+'\n');
+            }
+            current = parent;
+        }
+        Collections.reverse(path);
+        System.out.println("Solution path:");
+        for (String action : path) {
+            System.out.println(action);
+        }
+        System.out.println("Puzzle has been solved in " + path.size() + " steps in " + elapsedTime + " milliseconds!");
+    }
 
+    // Helper method to find the index of the different level between two arrays
+    public static int[] findDifferentLevelIndex(int[][] levels1, int[][] levels2) {
+        int[] arr = new int[2];
+        boolean flag = false;
+        for (int i = 0; i < levels1.length; i++) {
+            if (!Tools.arraysEqual(levels1[i],levels2[i])&&flag==false) {
+                arr[0] = i+1;
+                flag = true;
+            }
+            if (!Tools.arraysEqual(levels1[i],levels2[i])&&flag==true) {
+                arr[1] = i+1;
+            }
+        }
+        return arr;
+    }
+
+    public static void updateOpenSet(Hashtable<Integer, Container> openSet, Set<String> closedSet, List<Container> neighbors) {
+        for (Container neighborContainer : neighbors) {
+            int neighborHashCode = neighborContainer.hashCode();
+            String neighborStateHash = neighborContainer.toString();
+            // Check if the neighbor is not in the closed set and not already in the open set
+            if (!closedSet.contains(neighborStateHash) && !openSet.containsKey(neighborHashCode)) {
+                openSet.put(neighborHashCode, neighborContainer);
+            }
+        }
+    }
+
+    // Helper method to get the container with the minimum total cost from the open set
+    public static Container getMinCostContainer(Hashtable<Integer, Container> openSet) {
+        Container minContainer = null;
+        double heuristic;
+        double minHeuristic = Double.MAX_VALUE;
+        for (Container container : openSet.values()) {
+            heuristic = container.getHeuristic();
+            if (heuristic < minHeuristic) {
+                minHeuristic = heuristic;
+                minContainer = container;
+            }
+        }
+        return minContainer;
+    }
 }
