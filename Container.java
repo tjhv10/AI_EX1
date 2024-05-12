@@ -3,6 +3,8 @@ import java.util.Arrays;
 public class Container {
     private int[][] levels;
     private int hueristic;
+
+    
     public Container(int[][] levels) {
         this.levels = levels;
         this.hueristic = getHeuristic();

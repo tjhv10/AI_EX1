@@ -1,7 +1,5 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.HashSet;
 
 
@@ -70,10 +68,10 @@ public class Tools {
     public static int calculateHeuristic(int[][] levels) {
         int heuristicValue = 0;
         int[] res = new int[numOfColores(levels)+2];
-        res[0] = 0;
         int color;
         for (int i = 0; i < levels.length; i++) {
             if (top(levels[i])!=-1) {
+                heuristicValue++;
                 for (int j = levels[i].length-1; j > top(levels[i]); j--) {
                     color = levels[i][j];
                     while (levels[i][j-1]==color) {
@@ -85,14 +83,9 @@ public class Tools {
                 }
             }
         }
-        for (int i = 0; i < res.length; i++) {
+        for (int i = 1; i < res.length; i++) {
             heuristicValue += res[i];
         }
-        // for (int i = 0; i < levels.length; i++) {
-        //     if (top(levels[i])*2>=levels.length) {
-        //         heuristicValue++;
-        //     }
-        // }
         return heuristicValue;
     }
     public static void print2DArray(int[][] array) {
@@ -115,7 +108,6 @@ public class Tools {
                     Container neighbor = new Container(currentContainer); // Create a copy of the current container
                     performMove(from, to, neighbor);
                     neighbor.setHeuristic(neighbor.getHeuristic());
-                    // System.out.println(neighbor);
                     neighbors.add(neighbor); // Add the new container to neighbors
                 }
             }
@@ -148,25 +140,6 @@ public class Tools {
         }
         return builder.toString();
     }
-    public static int[][] generateState(int numContainers, int numColors) {
-        int[][] state = new int[numContainers][numColors];
-
-        // Fill the state with containers and colors
-        Arrays.fill(state[0], -1);
-        for (int i = 1; i < numContainers; i++) {
-            // Check if this array should be full of -1
-            Arrays.fill(state[i], i-2);
-        }
-        
-        Tools.print2DArray(state);
-        Container c = new Container(state);
-        // Randomly shuffle the state while ensuring valid moves
-        shuffleState(c);
-        System.out.println();
-        System.out.println();
-        Tools.print2DArray(state);
-        return state;
-    }
     public static boolean arraysEqual(int[] arr1, int[] arr2) {
         // Check each element of the arrays
         for (int i = 0; i < arr1.length; i++) {
@@ -175,26 +148,7 @@ public class Tools {
             }
         }
 
-        // Arrays are equal if all elements are equal
         return true;
     }
-    // Function to randomly shuffle the state while ensuring valid moves
-    private static void shuffleState(Container c) {
-        Random rand = new Random();
-        
-        // Shuffle the state multiple times to ensure randomness
-        for (int i = 0; i < 1000; i++) {
-            int fromContainer = rand.nextInt(c.getLevels().length);
-            int toContainer = rand.nextInt(c.getLevels().length);
-            
-            // Check if the move is valid
-            // if (Tools.isValidMove(fromContainer, toContainer, c.getLevels())) {
-            if(fromContainer!=toContainer){
-                System.out.println(fromContainer);
-                System.out.println(toContainer);
-                Tools.performMove(fromContainer, toContainer, c);
-                print2DArray(c.getLevels());
-            }
-        }
-    }
+
 }
