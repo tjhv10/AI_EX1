@@ -21,7 +21,7 @@ public class AStarPuzzleSolver {
             }
             openSet.remove(currentContainer.hashCode());
             List<Container> neighbors = Tools.generateNeighbors(currentContainer);
-            neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
+            // neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
             Tools.updateOpenSet(openSet, closedSet, neighbors);
             for (Container neighbor : neighbors) {
                 parentMap.put(neighbor, currentContainer);

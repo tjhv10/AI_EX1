@@ -1,6 +1,3 @@
-import java.util.ArrayList;
-import java.util.List;
-import java.util.HashSet;
 import java.util.*;
 
 
@@ -59,30 +56,21 @@ public class Tools {
         }
         return true;
     }
-    public static int numOfColores(int[][] levels)
-    {
-        HashSet<Integer> set = new HashSet<>();
-        for (int[] row : levels) {
-            for (int num : row) {
-                set.add(num);
-            }
-        }
-        return set.size()-1;
-    }
-    public static int calculateHeuristic(int[][] levels) {
+    
+    public static int calculateHeuristic(Container c) {
         int heuristicValue = 0;
-        int[] res = new int[numOfColores(levels)];
+        int[] res = new int[c.getNumOfColores()];
         int color;
-        for (int i = 0; i < levels.length; i++) {
-            if (top(levels[i])!=-1) {
-                for (int j = levels[i].length-1; j > top(levels[i]); j--) {
-                    color = levels[i][j];
-                    while (levels[i][j-1]==color) {
+        for (int i = 0; i < c.getLevels().length; i++) {
+            if (top(c.getLevels()[i])!=-1) {
+                for (int j = c.getLevels()[i].length-1; j > top(c.getLevels()[i]); j--) {
+                    color = c.getLevels()[i][j];
+                    while (c.getLevels()[i][j-1]==color) {
                         j--;
                         if(j==0)
                         break;
                     }
-                    res[color] += j - top(levels[i]);
+                    res[color] += j - top(c.getLevels()[i]);
                 }
             }
         }
@@ -220,5 +208,31 @@ public class Tools {
             }
         }
         return minContainer;
+    }
+    public static int[][] convertStringTo2DArray(String input) {
+        // Split the input string into individual arrays
+        String[] arrayStrings = input.split("\\],\\[");
+
+        // Create a 2D array with the maximum length found in the string
+        int maxLength = 0;
+        for (String arrayString : arrayStrings) {
+            String[] elements = arrayString.replaceAll("[\\[\\]]", "").split(",");
+            maxLength = Math.max(maxLength, elements.length);
+        }
+        int[][] result = new int[arrayStrings.length][maxLength];
+
+        // Fill the array with values from the string
+        for (int i = 0; i < arrayStrings.length; i++) {
+            String[] elements = arrayStrings[i].replaceAll("[\\[\\]]", "").split(",");
+            for (int j = 0; j < maxLength; j++) {
+                if (j < elements.length && !elements[j].isEmpty()) { // Check for empty string
+                    result[i][j] = Integer.parseInt(elements[j]);
+                } else {
+                    // Fill remaining elements with -1
+                    result[i][j] = -1;
+                }
+            }
+        }
+        return result;
     }
 }

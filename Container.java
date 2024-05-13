@@ -1,17 +1,34 @@
 import java.util.Arrays;
+import java.util.*;
 
 public class Container {
     private int[][] levels;
     private int hueristic;
+    private int numOfColoers;
 
-    
+    public int numOfColores()
+    {
+        HashSet<Integer> set = new HashSet<>();
+        for (int[] row : levels) {
+            for (int num : row) {
+                set.add(num);
+            }
+        }
+        return set.size();
+    }
+    public int getNumOfColores()
+    {
+        return numOfColoers;
+    }
     public Container(int[][] levels) {
         this.levels = levels;
+        this.numOfColoers = numOfColores();
         this.hueristic = getHeuristic();
     }
     public Container() {
         this.levels = new int[0][0];
         hueristic = 0;
+        numOfColoers = 0;
     }
     public Container(Container other) {
         int numRows = other.levels.length;
@@ -21,6 +38,7 @@ public class Container {
             System.arraycopy(other.levels[i], 0, this.levels[i], 0, numCols);
         }
         hueristic = other.hueristic;
+        numOfColoers = other.numOfColoers;
     }
     public int[][] getLevels() {
         return levels;
@@ -31,7 +49,7 @@ public class Container {
     }
     public int getHeuristic()
     {
-        return Tools.calculateHeuristic(this.levels);
+        return Tools.calculateHeuristic(this);
     }
     public void setHeuristic(int val)
     {
