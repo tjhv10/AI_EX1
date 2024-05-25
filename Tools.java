@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 
 
@@ -74,9 +77,15 @@ public class Tools {
                 }
             }
         }
-        for (int i = 1; i < res.length; i++) {
+        for (int i = 0; i < res.length; i++) {
             heuristicValue += res[i];
         }
+        for (int i = 1; i < c.getLevels().length; i++) {
+            if (top(c.getLevels()[i])!=-1) {
+                heuristicValue++;
+            }
+        }
+        heuristicValue-=res.length-2;
         return heuristicValue;
     }
     public static void print2DArray(int[][] array) {
@@ -146,7 +155,8 @@ public class Tools {
         return true;
     }
 // Helper method to output the solution path
-    public static void outputSolutionPath(Container goalContainer, Map<Container, Container> parentMap, long elapsedTime) {
+    public static long[] outputSolutionPath(Container goalContainer, Map<Container, Container> parentMap, long elapsedTime) {
+        long [] ret = new long[2];
         List<String> path = new ArrayList<>();
         Container current = goalContainer;
         while (current != null) {
@@ -161,11 +171,14 @@ public class Tools {
             current = parent;
         }
         Collections.reverse(path);
-        System.out.println("Solution path:");
-        for (String action : path) {
-            System.out.println(action);
-        }
+        // System.out.println("Solution path:");
+        // for (String action : path) {
+        //     System.out.println(action);
+        // }
         System.out.println("Puzzle has been solved in " + path.size() + " steps in " + elapsedTime + " milliseconds!");
+        ret[0] = path.size();
+        ret[1] = elapsedTime;
+        return ret;
     }
 
     // Helper method to find the index of the different level between two arrays
@@ -220,19 +233,105 @@ public class Tools {
             maxLength = Math.max(maxLength, elements.length);
         }
         int[][] result = new int[arrayStrings.length][maxLength];
-
         // Fill the array with values from the string
         for (int i = 0; i < arrayStrings.length; i++) {
             String[] elements = arrayStrings[i].replaceAll("[\\[\\]]", "").split(",");
-            for (int j = 0; j < maxLength; j++) {
-                if (j < elements.length && !elements[j].isEmpty()) { // Check for empty string
-                    result[i][j] = Integer.parseInt(elements[j]);
-                } else {
-                    // Fill remaining elements with -1
-                    result[i][j] = -1;
+            int[] intElements = new int[elements.length];
+            for (int j = 0; j < elements.length; j++) {
+                if (!elements[j].isEmpty()) {
+                    intElements[j] = Integer.parseInt(elements[j]);
+                }
+                else
+                {
+                    intElements = new int[0];
                 }
             }
+            result[i] = fillArrayFromTop(intElements, maxLength);
         }
         return result;
+    }
+
+    public static int[] fillArrayFromTop(int[] arr, int maxLength) {
+        int[] result = new int[maxLength];
+        int len = arr.length;
+        int diff = maxLength-len;
+        for (int i = len-1; i >= 0; i--) {
+            result[i + diff] = arr[i];
+        }
+        for (int i = 0; i < diff; i++) {
+            result[i] = -1;
+        }
+        return result;
+    }
+
+    public static long[] solvePuzzle(Container initialContainer) {
+        Hashtable<Integer, Container> openSet = new Hashtable<>();
+        Set<String> closedSet = new HashSet<>();
+        Map<Container, Container> parentMap = new HashMap<>();
+        openSet.put(initialContainer.hashCode(), initialContainer);
+        long startTime = System.currentTimeMillis();
+        while (!openSet.isEmpty()) {
+            Container currentContainer = Tools.getMinCostContainer(openSet);
+            // System.out.println(currentContainer.getHeuristic());
+            if (Tools.isGoalState(currentContainer)) {
+                long endTime = System.currentTimeMillis();
+                long elapsedTime = endTime - startTime;
+                return Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime);
+            }
+            String stateHash = currentContainer.toString();
+            if (!closedSet.contains(stateHash)) {
+                closedSet.add(stateHash);
+            }
+            openSet.remove(currentContainer.hashCode());
+            List<Container> neighbors = Tools.generateNeighbors(currentContainer);
+            // System.out.println(neighbors.size());
+            // neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
+            Tools.updateOpenSet(openSet, closedSet, neighbors);
+            for (Container neighbor : neighbors) {
+                parentMap.put(neighbor, currentContainer);
+            }
+        }
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("No solution found. Time elapsed: " + elapsedTime + " milliseconds.");
+        return null;
+    }
+
+
+
+    public static List<String> extractInitRows(String filePath) throws IOException {
+        List<String> initRows = new ArrayList<>();
+        BufferedReader reader = new BufferedReader(new FileReader(filePath));
+        String line;
+        StringBuilder section = new StringBuilder();
+
+        while ((line = reader.readLine()) != null) {
+            if (line.startsWith("####")) {
+                if (section.length() > 0) {
+                    initRows.add(extractInitRow(section.toString()));
+                    section.setLength(0); // Clear the section
+                }
+            } else {
+                section.append(line).append("\n");
+            }
+        }
+
+        // Handle the last section
+        if (section.length() > 0) {
+            initRows.add(extractInitRow(section.toString()));
+        }
+
+        reader.close();
+        return initRows;
+    }
+
+    private static String extractInitRow(String section) {
+        String[] lines = section.split("\n");
+        for (String line : lines) {
+            if (line.trim().startsWith("init=")) {
+                return line.trim().split("=")[1];
+            }
+        }
+        return "";
     }
 }
