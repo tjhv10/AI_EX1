@@ -1,55 +1,3 @@
-// public class Main {
-//     public static void main(String[] args) {
-//         // AStarPuzzleSolver solver = new AStarPuzzleSolver();
-//         // int[][] ezState = 
-//         // {{1,2,0,0}
-//         // ,{1,2,0,1}
-//         // ,{2,0,1,2}
-//         // ,{-1,-1,-1,-1}
-//         // ,{-1,-1,-1,-1}};
-//         // int[][] unsolveableState = 
-//         // {{1,2,3,2}
-//         // ,{2,2,0,3}
-//         // ,{1,0,3,0}
-//         // ,{1,0,3,1}
-//         // ,{-1,-1,-1,-1}};
-//         // int[][] hardState = 
-//         // {{1,2,1,3}
-//         // ,{4,1,0,2}
-//         // ,{2,0,2,1}
-//         // ,{4,4,4,0}
-//         // ,{0,3,3,3}
-//         // ,{-1,-1,-1,-1}
-//         // ,{-1,-1,-1,-1}};
-//         // int[][] a = {{0, 0, 0, 0, 0, 0, 1, 2}};
-//         // System.out.println(Tools.calculateHeuristic(a));
-//         String input = "[[1,3,5,4,4,7,6,1],[2,2,0,0,4,3,6,7],[2,1,1,4,5,6,0,2],[0,6,6,5,4,7,7,3],[3,4,1,0,5,7,4,4],[7,6,2,2,3,1,0,0],[7,3,3,1,2,5,5,6],[7,6,5,5,3,2,1,0],[],[]]";
-//         // String input = "[[1,2,3,4,4,3,5],[5,3,4,3,2,4,0],[4,5,6,0,2,0,5],[6,1,1,5,5,5,0],[6,2,1,1,6,2,3],[1,0,3,4,6,2,2],[1,3,4,6,6,0,0],[],[]]";
-//         int[][] superHardstate = Tools.convertStringTo2DArray(input);
-//         Container c = new Container(superHardstate);
-//         long minT = 99999999,minS = 99999999;
-//         long [] cur = new long[2];
-
-//         for (int i = 0; i < 1000; i++) {
-//             cur = Tools.solvePuzzle(c);
-//             if (minS>cur[0]) {
-//                 minS = cur[0];
-//             }
-//             if (minT>cur[1]) {
-//                 minT = cur[1];
-//             }
-//         }
-//         System.out.println();
-//         System.out.println();
-//         System.out.println("Steps: "+minS);
-//         System.out.println("Time: "+minT);
-//     }
-// }
-
-
-
-
-
 import java.io.IOException;
 import java.util.List;
 public class Main {
@@ -84,10 +32,3 @@ public class Main {
         }
     }
 }
-
-
-
-
-
-
-
