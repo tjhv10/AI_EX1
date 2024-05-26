@@ -7,7 +7,7 @@ public class Main {
         String filePath = "instences.txt";
         try {
             List<String> initRows = Tools.extractInitRows(filePath);
-            int i = 0;
+            int i = 18;
             // for (String initRow : initRows) {
                 System.out.println("Puzzle "+i+":");
                 i++;

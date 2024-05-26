@@ -81,12 +81,12 @@ public class Tools {
         for (int i = 0; i < res.length; i++) {
             heuristicValue += res[i];
         }
-        for (int i = 1; i < c.getLevels().length; i++) {
-            if (top(c.getLevels()[i])!=-1) {
-                heuristicValue++;
-            }
-        }
-        heuristicValue-=res.length-2;
+        // for (int i = 1; i < c.getLevels().length; i++) {
+        //     if (top(c.getLevels()[i])!=-1) {
+        //         heuristicValue++;
+        //     }
+        // }
+        // heuristicValue-=res.length-2;
         return heuristicValue;
     }
     public static void print2DArray(int[][] array) {
@@ -147,7 +147,6 @@ public class Tools {
         for (int i = numRows; i < numRows + newArrays; i++) {
             Arrays.fill(result[i], -1);
         }
-
         return result;
     }
     // Generate neighboring states from the current state (container)
@@ -161,7 +160,6 @@ public class Tools {
             for (int to = 0; to < numContainers; to++) {
                 if (isValidMove(from, to, currentContainer.getLevels())&&from!=to) {
                     Container neighbor = new Container(currentContainer);
-                     // Create a copy of the current container
                     performMove(from, to, neighbor);
                     neighbor.setLevels( addNewArrays(neighbor.getLevels(), numContainersStart-numContainers));
                     neighbor.setHeuristic(Tools.calculateHeuristic(neighbor));
@@ -249,7 +247,7 @@ public class Tools {
         return arr;
     }
 
-    public static void updateOpenSet(Hashtable<Integer, Container> openSet, Set<String> closedSet, List<Container> neighbors,int firstHeuristic) {
+    public static void updateOpenSet(Hashtable<Integer, Container> openSet, Set<String> closedSet, List<Container> neighbors) {
         for (Container neighborContainer : neighbors) {
             // String neighborStateHash = neighborContainer.toString();
             // Check if the neighbor is not in the closed set and not already in the open set
@@ -369,42 +367,54 @@ public class Tools {
     
             return filteredOpenSet;
         }
-
-    public static long[] solvePuzzle(Container initialContainer) {
-        int i =0;
-        Hashtable<Integer, Container> openSet = new Hashtable<>();
-        Set<String> closedSet = new HashSet<>();
-        Map<Container, Container> parentMap = new HashMap<>();
-        openSet.put(initialContainer.hashCode(), initialContainer);
-        long startTime = System.currentTimeMillis();
-        while (!openSet.isEmpty()) {
-            i++;
-            Container currentContainer = Tools.getMinCostContainer(openSet);
-            System.out.println(currentContainer.getHeuristic());
-            if (Tools.isGoalState(currentContainer)) {
-                long endTime = System.currentTimeMillis();
-                long elapsedTime = endTime - startTime;
-                return Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i);
-            }
-            // String stateHash = currentContainer.toString();
-            // if (!closedSet.contains(stateHash)) {
-            //     closedSet.add(stateHash);
-            // }
-            openSet.remove(currentContainer.hashCode());
-            List<Container> neighbors = Tools.generateNeighbors(currentContainer);
-            // System.out.println(neighbors.size());
-            // neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
-            if (openSet.size()>1000) {
-                openSet = sortAndFilterContainers(openSet);
-            }
-            Tools.updateOpenSet(openSet, closedSet, neighbors,currentContainer.getHeuristic());
-            for (Container neighbor : neighbors) {
-                parentMap.put(neighbor, currentContainer);
-            }
+        public static long estimateMemoryUsage(Object object) {
+            Runtime runtime = Runtime.getRuntime();
+            long beforeMemory = runtime.totalMemory() - runtime.freeMemory();
+            // Create the object or perform any operations you want to measure
+            // Ensure that garbage collection is performed to release unused memory
+            System.gc(); // Request garbage collection to reclaim memory
+            long afterMemory = runtime.totalMemory() - runtime.freeMemory();
+            return afterMemory - beforeMemory;
         }
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-        System.out.println("No solution found. Time elapsed: " + elapsedTime + " milliseconds In "+i+" itaretions.");
-        return null;
+        public static long[] solvePuzzle(Container initialContainer) {
+            int i =0;
+            List<Container> neighbors =null;
+            Hashtable<Integer, Container> openSet = new Hashtable<>();
+            Set<String> closedSet = new HashSet<>();
+            Map<Container, Container> parentMap = new HashMap<>();
+            openSet.put(initialContainer.hashCode(), initialContainer);
+            long startTime = System.currentTimeMillis();
+            while (!openSet.isEmpty()) {
+                // long memoryUsage = estimateMemoryUsage(parentMap);
+                // System.out.println("Estimated memory usage of the object: " + memoryUsage + " bytes");
+                // System.out.println(parentMap.size());
+                i++;
+                Container currentContainer = Tools.getMinCostContainer(openSet);
+                System.out.println(currentContainer.getHeuristic());
+                if (Tools.isGoalState(currentContainer)) {
+                    long endTime = System.currentTimeMillis();
+                    long elapsedTime = endTime - startTime;
+                    return Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i);
+                }
+                // String stateHash = currentContainer.toString();
+                // if (!closedSet.contains(stateHash)) {
+                //     closedSet.add(stateHash);
+                // }
+                openSet.remove(currentContainer.hashCode());
+                neighbors = Tools.generateNeighbors(currentContainer);
+                // System.out.println(neighbors.size());
+                // neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
+                if (openSet.size()>1000) {
+                    openSet = sortAndFilterContainers(openSet);
+                }
+                Tools.updateOpenSet(openSet, closedSet, neighbors);
+                for (Container neighbor : neighbors) {
+                    parentMap.put(neighbor, currentContainer);
+                }
+            }
+            long endTime = System.currentTimeMillis();
+            long elapsedTime = endTime - startTime;
+            System.out.println("No solution found. Time elapsed: " + elapsedTime + " milliseconds In "+i+" itaretions.");
+            return null;
     }
 }
