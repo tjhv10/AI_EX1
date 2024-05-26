@@ -161,13 +161,11 @@ public class Tools {
             for (int to = 0; to < numContainers; to++) {
                 if (isValidMove(from, to, currentContainer.getLevels())&&from!=to) {
                     Container neighbor = new Container(currentContainer);
-                    print2DArray(neighbor.getLevels()); // Create a copy of the current container
+                     // Create a copy of the current container
                     performMove(from, to, neighbor);
-                    print2DArray(neighbor.getLevels());
                     neighbor.setLevels( addNewArrays(neighbor.getLevels(), numContainersStart-numContainers));
                     neighbor.setHeuristic(Tools.calculateHeuristic(neighbor));
-                    print2DArray(neighbor.getLevels());
-                    neighbors.add(neighbor); // Add the new container to neighbors
+                    neighbors.add(neighbor);
                 }
             }
         }
@@ -251,14 +249,12 @@ public class Tools {
         return arr;
     }
 
-    public static void updateOpenSet(Hashtable<Integer, Container> openSet, Set<String> closedSet, List<Container> neighbors) {
+    public static void updateOpenSet(Hashtable<Integer, Container> openSet, Set<String> closedSet, List<Container> neighbors,int firstHeuristic) {
         for (Container neighborContainer : neighbors) {
-            int neighborHashCode = neighborContainer.hashCode();
-            String neighborStateHash = neighborContainer.toString();
+            // String neighborStateHash = neighborContainer.toString();
             // Check if the neighbor is not in the closed set and not already in the open set
-            if (!closedSet.contains(neighborStateHash) && !openSet.containsKey(neighborHashCode)) {
-                openSet.put(neighborHashCode, neighborContainer);
-            }
+            // if (!closedSet.contains(neighborStateHash)&& !openSet.containsKey(neighborHashCode)&&neighborContainer.getHeuristic()<firstHeuristic)
+                openSet.put(neighborContainer.hashCode(), neighborContainer);
         }
     }
 
@@ -317,44 +313,6 @@ public class Tools {
         }
         return result;
     }
-
-    public static long[] solvePuzzle(Container initialContainer) {
-        int i =0;
-        Hashtable<Integer, Container> openSet = new Hashtable<>();
-        Set<String> closedSet = new HashSet<>();
-        Map<Container, Container> parentMap = new HashMap<>();
-        openSet.put(initialContainer.hashCode(), initialContainer);
-        long startTime = System.currentTimeMillis();
-        while (!openSet.isEmpty()) {
-            i++;
-            Container currentContainer = Tools.getMinCostContainer(openSet);
-            // System.out.println(currentContainer.getHeuristic());
-            if (Tools.isGoalState(currentContainer)) {
-                long endTime = System.currentTimeMillis();
-                long elapsedTime = endTime - startTime;
-                return Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i);
-            }
-            String stateHash = currentContainer.toString();
-            if (!closedSet.contains(stateHash)) {
-                closedSet.add(stateHash);
-            }
-            openSet.remove(currentContainer.hashCode());
-            List<Container> neighbors = Tools.generateNeighbors(currentContainer);
-            // System.out.println(neighbors.size());
-            // neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
-            Tools.updateOpenSet(openSet, closedSet, neighbors);
-            for (Container neighbor : neighbors) {
-                parentMap.put(neighbor, currentContainer);
-            }
-        }
-        long endTime = System.currentTimeMillis();
-        long elapsedTime = endTime - startTime;
-        System.out.println("No solution found. Time elapsed: " + elapsedTime + " milliseconds In "+i+" itaretions.");
-        return null;
-    }
-
-
-
     public static List<String> extractInitRows(String filePath) throws IOException {
         List<String> initRows = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
@@ -389,5 +347,64 @@ public class Tools {
             }
         }
         return "";
+    }
+        public static Hashtable<Integer, Container> sortAndFilterContainers(Hashtable<Integer, Container> openSet) {
+            // Convert the Hashtable values to a List
+            List<Map.Entry<Integer, Container>> entryList = new ArrayList<>(openSet.entrySet());
+    
+            // Sort the list based on the heuristic value in descending order
+            entryList.sort((e1, e2) -> Integer.compare(e2.getValue().getHeuristic(), e1.getValue().getHeuristic()));
+    
+            // Calculate the number of containers to keep (1/4 of the total number)
+            int numberToKeep = entryList.size() / 4;
+    
+            // Filter the containers, keeping the 1/4 with the lowest heuristic values
+            List<Map.Entry<Integer, Container>> filteredEntries = entryList.subList(entryList.size() - numberToKeep, entryList.size());
+    
+            // Create a new Hashtable to store the filtered containers
+            Hashtable<Integer, Container> filteredOpenSet = new Hashtable<>();
+            for (Map.Entry<Integer, Container> entry : filteredEntries) {
+                filteredOpenSet.put(entry.getKey(), entry.getValue());
+            }
+    
+            return filteredOpenSet;
+        }
+
+    public static long[] solvePuzzle(Container initialContainer) {
+        int i =0;
+        Hashtable<Integer, Container> openSet = new Hashtable<>();
+        Set<String> closedSet = new HashSet<>();
+        Map<Container, Container> parentMap = new HashMap<>();
+        openSet.put(initialContainer.hashCode(), initialContainer);
+        long startTime = System.currentTimeMillis();
+        while (!openSet.isEmpty()) {
+            i++;
+            Container currentContainer = Tools.getMinCostContainer(openSet);
+            System.out.println(currentContainer.getHeuristic());
+            if (Tools.isGoalState(currentContainer)) {
+                long endTime = System.currentTimeMillis();
+                long elapsedTime = endTime - startTime;
+                return Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i);
+            }
+            // String stateHash = currentContainer.toString();
+            // if (!closedSet.contains(stateHash)) {
+            //     closedSet.add(stateHash);
+            // }
+            openSet.remove(currentContainer.hashCode());
+            List<Container> neighbors = Tools.generateNeighbors(currentContainer);
+            // System.out.println(neighbors.size());
+            // neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
+            if (openSet.size()>1000) {
+                openSet = sortAndFilterContainers(openSet);
+            }
+            Tools.updateOpenSet(openSet, closedSet, neighbors,currentContainer.getHeuristic());
+            for (Container neighbor : neighbors) {
+                parentMap.put(neighbor, currentContainer);
+            }
+        }
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("No solution found. Time elapsed: " + elapsedTime + " milliseconds In "+i+" itaretions.");
+        return null;
     }
 }
