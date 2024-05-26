@@ -23,7 +23,7 @@ public class Container {
     public Container(int[][] levels) {
         this.levels = levels;
         this.numOfColoers = numOfColores();
-        this.hueristic = getHeuristic();
+        this.hueristic = Tools.calculateHeuristic(this);
     }
     public Container() {
         this.levels = new int[0][0];
@@ -37,7 +37,7 @@ public class Container {
         for (int i = 0; i < numRows; i++) {
             System.arraycopy(other.levels[i], 0, this.levels[i], 0, numCols);
         }
-        hueristic = other.hueristic;
+        hueristic = Tools.calculateHeuristic(other);
         numOfColoers = other.numOfColoers;
     }
     public int[][] getLevels() {
@@ -49,7 +49,7 @@ public class Container {
     }
     public int getHeuristic()
     {
-        return Tools.calculateHeuristic(this);
+        return hueristic;
     }
     public void setHeuristic(int val)
     {
