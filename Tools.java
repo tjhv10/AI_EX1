@@ -103,17 +103,70 @@ public class Tools {
         }
         System.out.println();
     }
+    public static int[][] filterArrays(int[][] arr) {
+        ArrayList<int[]> filteredList = new ArrayList<>();
+        boolean hasAddedFullOfNegOnes = false;
+
+        for (int[] subArr : arr) {
+            boolean isFullOfNegOnes = true;
+            for (int num : subArr) {
+                if (num != -1) {
+                    isFullOfNegOnes = false;
+                    break;
+                }
+            }
+            if (isFullOfNegOnes && !hasAddedFullOfNegOnes) {
+                filteredList.add(subArr);
+                hasAddedFullOfNegOnes = true;
+            } else if (!isFullOfNegOnes) {
+                filteredList.add(subArr);
+            }
+        }
+
+        // Convert the ArrayList back to a 2D array
+        int[][] result = new int[filteredList.size()][];
+        for (int i = 0; i < filteredList.size(); i++) {
+            result[i] = filteredList.get(i);
+        }
+
+        return result;
+    }
+    public static int[][] addNewArrays(int[][] arr, int newArrays) {
+        int numRows = arr.length;
+        int numCols = arr[0].length;  // assuming all rows have the same number of columns
+
+        // Create a new 2D array with the additional rows
+        int[][] result = new int[numRows + newArrays][numCols];
+
+        // Copy the original arrays into the result
+        for (int i = 0; i < numRows; i++) {
+            result[i] = Arrays.copyOf(arr[i], numCols);
+        }
+
+        // Add the new arrays full of -1
+        for (int i = numRows; i < numRows + newArrays; i++) {
+            Arrays.fill(result[i], -1);
+        }
+
+        return result;
+    }
     // Generate neighboring states from the current state (container)
     public static List<Container> generateNeighbors(Container currentContainer) {
         List<Container> neighbors = new ArrayList<>();
+        int numContainersStart = currentContainer.getLevels().length;
+        currentContainer = new Container(filterArrays(currentContainer.getLevels()));
         int numContainers = currentContainer.getLevels().length;
         // Try pouring from each container to all other containers
         for (int from = 0; from < numContainers; from++) {
             for (int to = 0; to < numContainers; to++) {
                 if (isValidMove(from, to, currentContainer.getLevels())&&from!=to) {
-                    Container neighbor = new Container(currentContainer); // Create a copy of the current container
+                    Container neighbor = new Container(currentContainer);
+                    print2DArray(neighbor.getLevels()); // Create a copy of the current container
                     performMove(from, to, neighbor);
+                    print2DArray(neighbor.getLevels());
+                    neighbor.setLevels( addNewArrays(neighbor.getLevels(), numContainersStart-numContainers));
                     neighbor.setHeuristic(Tools.calculateHeuristic(neighbor));
+                    print2DArray(neighbor.getLevels());
                     neighbors.add(neighbor); // Add the new container to neighbors
                 }
             }
