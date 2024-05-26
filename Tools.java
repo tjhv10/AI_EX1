@@ -81,12 +81,12 @@ public class Tools {
         for (int i = 0; i < res.length; i++) {
             heuristicValue += res[i];
         }
-        // for (int i = 1; i < c.getLevels().length; i++) {
-        //     if (top(c.getLevels()[i])!=-1) {
-        //         heuristicValue++;
-        //     }
-        // }
-        // heuristicValue-=res.length-2;
+        for (int i = 1; i < c.getLevels().length; i++) {
+            if (top(c.getLevels()[i])!=-1) {
+                heuristicValue++;
+            }
+        }
+        heuristicValue-=res.length-2;
         return heuristicValue;
     }
     public static void print2DArray(int[][] array) {
@@ -205,7 +205,7 @@ public class Tools {
         return true;
     }
 // Helper method to output the solution path
-    public static long[] outputSolutionPath(Container goalContainer, Map<Container, Container> parentMap, long elapsedTime,int i) {
+    public static long[] outputSolutionPath(Container goalContainer, Map<Container, Container> parentMap, long elapsedTime,int i,int j) {
         long [] ret = new long[2];
         List<String> path = new ArrayList<>();
         Container current = goalContainer;
@@ -249,9 +249,10 @@ public class Tools {
 
     public static void updateOpenSet(Hashtable<Integer, Container> openSet, Set<String> closedSet, List<Container> neighbors) {
         for (Container neighborContainer : neighbors) {
-            // String neighborStateHash = neighborContainer.toString();
+            String neighborStateHash = neighborContainer.toString();
+            int neighborHashCode = neighborContainer.hashCode();
             // Check if the neighbor is not in the closed set and not already in the open set
-            // if (!closedSet.contains(neighborStateHash)&& !openSet.containsKey(neighborHashCode)&&neighborContainer.getHeuristic()<firstHeuristic)
+            if (!closedSet.contains(neighborStateHash)&& !openSet.containsKey(neighborHashCode))
                 openSet.put(neighborContainer.hashCode(), neighborContainer);
         }
     }
@@ -367,17 +368,8 @@ public class Tools {
     
             return filteredOpenSet;
         }
-        public static long estimateMemoryUsage(Object object) {
-            Runtime runtime = Runtime.getRuntime();
-            long beforeMemory = runtime.totalMemory() - runtime.freeMemory();
-            // Create the object or perform any operations you want to measure
-            // Ensure that garbage collection is performed to release unused memory
-            System.gc(); // Request garbage collection to reclaim memory
-            long afterMemory = runtime.totalMemory() - runtime.freeMemory();
-            return afterMemory - beforeMemory;
-        }
         public static long[] solvePuzzle(Container initialContainer) {
-            int i =0;
+            int i =0,j = 0;
             List<Container> neighbors =null;
             Hashtable<Integer, Container> openSet = new Hashtable<>();
             Set<String> closedSet = new HashSet<>();
@@ -385,21 +377,18 @@ public class Tools {
             openSet.put(initialContainer.hashCode(), initialContainer);
             long startTime = System.currentTimeMillis();
             while (!openSet.isEmpty()) {
-                // long memoryUsage = estimateMemoryUsage(parentMap);
-                // System.out.println("Estimated memory usage of the object: " + memoryUsage + " bytes");
-                // System.out.println(parentMap.size());
                 i++;
                 Container currentContainer = Tools.getMinCostContainer(openSet);
-                System.out.println(currentContainer.getHeuristic());
+                // System.out.println(currentContainer.getHeuristic());
                 if (Tools.isGoalState(currentContainer)) {
                     long endTime = System.currentTimeMillis();
                     long elapsedTime = endTime - startTime;
-                    return Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i);
+                    return Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i,j);
                 }
-                // String stateHash = currentContainer.toString();
-                // if (!closedSet.contains(stateHash)) {
-                //     closedSet.add(stateHash);
-                // }
+                String stateHash = currentContainer.toString();
+                if (!closedSet.contains(stateHash)) {
+                    closedSet.add(stateHash);
+                }
                 openSet.remove(currentContainer.hashCode());
                 neighbors = Tools.generateNeighbors(currentContainer);
                 // System.out.println(neighbors.size());
