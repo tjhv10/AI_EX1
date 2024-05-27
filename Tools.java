@@ -205,8 +205,7 @@ public class Tools {
         return true;
     }
 // Helper method to output the solution path
-    public static long[] outputSolutionPath(Container goalContainer, Map<Container, Container> parentMap, long elapsedTime,int i,int j) {
-        long [] ret = new long[2];
+    public static void outputSolutionPath(Container goalContainer, Map<Container, Container> parentMap, long elapsedTime,int i) {
         List<String> path = new ArrayList<>();
         Container current = goalContainer;
         while (current != null) {
@@ -226,9 +225,6 @@ public class Tools {
         //     System.out.println(action);
         // }
         System.out.println("Puzzle has been solved in " + path.size() + " steps in " + elapsedTime + " milliseconds in "+i+" itaretions.");
-        ret[0] = path.size();
-        ret[1] = elapsedTime;
-        return ret;
     }
 
     // Helper method to find the index of the different level between two arrays
@@ -368,8 +364,8 @@ public class Tools {
     
             return filteredOpenSet;
         }
-        public static long[] solvePuzzle(Container initialContainer) {
-            int i =0,j = 0;
+        public static void solvePuzzle(Container initialContainer) {
+            int i =0;
             List<Container> neighbors =null;
             Hashtable<Integer, Container> openSet = new Hashtable<>();
             Set<String> closedSet = new HashSet<>();
@@ -383,7 +379,8 @@ public class Tools {
                 if (Tools.isGoalState(currentContainer)) {
                     long endTime = System.currentTimeMillis();
                     long elapsedTime = endTime - startTime;
-                    return Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i,j);
+                    Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i);
+                    return;
                 }
                 String stateHash = currentContainer.toString();
                 if (!closedSet.contains(stateHash)) {
@@ -391,19 +388,20 @@ public class Tools {
                 }
                 openSet.remove(currentContainer.hashCode());
                 neighbors = Tools.generateNeighbors(currentContainer);
-                // System.out.println(neighbors.size());
-                // neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
                 if (openSet.size()>1000) {
                     openSet = sortAndFilterContainers(openSet);
                 }
                 Tools.updateOpenSet(openSet, closedSet, neighbors);
-                for (Container neighbor : neighbors) {
-                    parentMap.put(neighbor, currentContainer);
+                neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
+                double size = neighbors.size()/1.8;
+                for (int k = 0; k<size; k++) {
+                    parentMap.put(neighbors.get(k), currentContainer);
                 }
             }
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - startTime;
             System.out.println("No solution found. Time elapsed: " + elapsedTime + " milliseconds In "+i+" itaretions.");
-            return null;
+            return;
     }
 }
+
