@@ -63,11 +63,11 @@ public class Tools {
     
     public static int calculateHeuristic(Container c) {
         int heuristicValue = 0;
-        int[] res = new int[c.getNumOfColores()];
+        int[] res = new int[c.getNumOfColors()];
         int color;
         for (int i = 0; i < c.getLevels().length; i++) {
             if (top(c.getLevels()[i])!=-1) {
-                heuristicValue++;
+                heuristicValue+=2;
                 for (int j = c.getLevels()[i].length-1; j > top(c.getLevels()[i]); j--) {
                     color = c.getLevels()[i][j];
                     while (c.getLevels()[i][j-1]==color) {
@@ -82,7 +82,7 @@ public class Tools {
         for (int i = 0; i < res.length; i++) {
             heuristicValue += res[i];
         }
-        return heuristicValue - res.length-2;
+        return heuristicValue - res.length+1;
     }
     public static void print2DArray(int[][] array) {
         for (int i = 0; i < array.length; i++) {
@@ -148,7 +148,9 @@ public class Tools {
     public static List<Container> generateNeighbors(Container currentContainer) {
         List<Container> neighbors = new ArrayList<>();
         int numContainersStart = currentContainer.getLevels().length;
-        currentContainer = new Container(filterArrays(currentContainer.getLevels()));
+        
+        currentContainer = new Container(filterArrays(currentContainer.getLevels()),currentContainer.getSteps(),currentContainer.getHeuristic(),currentContainer.getNumOfColors());
+
         int numContainers = currentContainer.getLevels().length;
         // Try pouring from each container to all other containers
         for (int from = 0; from < numContainers; from++) {
@@ -156,7 +158,8 @@ public class Tools {
                 if (isValidMove(from, to, currentContainer.getLevels())&&from!=to) {
                     Container neighbor = new Container(currentContainer);
                     performMove(from, to, neighbor);
-                    neighbor.setLevels( addNewArrays(neighbor.getLevels(), numContainersStart-numContainers));
+                    neighbor.setLevels(addNewArrays(neighbor.getLevels(), numContainersStart-numContainers));
+                    neighbor.setSteps(currentContainer.getSteps()+1);
                     neighbor.setHeuristic(Tools.calculateHeuristic(neighbor));
                     neighbors.add(neighbor);
                 }
@@ -219,7 +222,7 @@ public class Tools {
         // for (String action : path) {
         //     System.out.println(action);
         // }
-        System.out.println("Puzzle has been solved in " + path.size() + " steps in " + elapsedTime + " milliseconds in "+i+" itaretions.");
+        System.out.println("Puzzle has been solved in " + goalContainer.getSteps() + " steps in " + elapsedTime + " milliseconds in "+i+" itaretions.");
     }
 
     // Helper method to find the index of the different level between two arrays
@@ -251,12 +254,12 @@ public class Tools {
     // Helper method to get the container with the minimum total cost from the open set
     public static Container getMinCostContainer(Hashtable<Integer, Container> openSet) {
         Container minContainer = null;
-        double heuristic;
-        double minHeuristic = Double.MAX_VALUE;
+        double f;
+        double minVal = Double.MAX_VALUE;
         for (Container container : openSet.values()) {
-            heuristic = container.getHeuristic();
-            if (heuristic < minHeuristic) {
-                minHeuristic = heuristic;
+            f = container.getHeuristic()+container.getSteps();
+            if (f < minVal) {
+                minVal = f;
                 minContainer = container;
             }
         }
@@ -338,59 +341,40 @@ public class Tools {
         }
         return "";
     }
-        public static Hashtable<Integer, Container> sortAndFilterContainers(Hashtable<Integer, Container> openSet) {
-            // Convert the Hashtable values to a List
-            List<Map.Entry<Integer, Container>> entryList = new ArrayList<>(openSet.entrySet());
     
-            // Sort the list based on the heuristic value in descending order
-            entryList.sort((e1, e2) -> Integer.compare(e2.getValue().getHeuristic(), e1.getValue().getHeuristic()));
-    
-            // Calculate the number of containers to keep (1/4 of the total number)
-            int numberToKeep = entryList.size() / 4;
-    
-            // Filter the containers, keeping the 1/4 with the lowest heuristic values
-            List<Map.Entry<Integer, Container>> filteredEntries = entryList.subList(entryList.size() - numberToKeep, entryList.size());
-    
-            // Create a new Hashtable to store the filtered containers
-            Hashtable<Integer, Container> filteredOpenSet = new Hashtable<>();
-            for (Map.Entry<Integer, Container> entry : filteredEntries) {
-                filteredOpenSet.put(entry.getKey(), entry.getValue());
+    public static void solvePuzzle(Container initialContainer) {
+        int i =0;
+        List<Container> neighbors =null;
+        Hashtable<Integer, Container> openSet = new Hashtable<>();
+        Set<String> closedSet = new HashSet<>();
+        Map<Container, Container> parentMap = new HashMap<>();
+        openSet.put(initialContainer.hashCode(), initialContainer);
+        long startTime = System.currentTimeMillis();
+        while (!openSet.isEmpty()) {
+            i++;
+            Container currentContainer = Tools.getMinCostContainer(openSet);
+            // System.out.println(currentContainer.getHeuristic()+currentContainer.getSteps());
+            if (Tools.isGoalState(currentContainer)) {
+                long endTime = System.currentTimeMillis();
+                long elapsedTime = endTime - startTime;
+                Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i);
+                return;
             }
-    
-            return filteredOpenSet;
+            String stateHash = currentContainer.toString();
+            // System.out.println(stateHash);
+            if (!closedSet.contains(stateHash)) {
+                closedSet.add(stateHash);
+            }
+            openSet.remove(currentContainer.hashCode());
+            neighbors = Tools.generateNeighbors(currentContainer);
+            Tools.updateOpenSet(openSet, closedSet, neighbors);
+            // for (int k = 0; k<neighbors.size(); k++)
+            //     parentMap.put(neighbors.get(k), currentContainer);
         }
-        public static void solvePuzzle(Container initialContainer) {
-            int i =0;
-            List<Container> neighbors =null;
-            Hashtable<Integer, Container> openSet = new Hashtable<>();
-            Set<String> closedSet = new HashSet<>();
-            Map<Container, Container> parentMap = new HashMap<>();
-            openSet.put(initialContainer.hashCode(), initialContainer);
-            long startTime = System.currentTimeMillis();
-            while (!openSet.isEmpty()) {
-                i++;
-                Container currentContainer = Tools.getMinCostContainer(openSet);
-                System.out.println(currentContainer.getHeuristic());
-                if (Tools.isGoalState(currentContainer)) {
-                    long endTime = System.currentTimeMillis();
-                    long elapsedTime = endTime - startTime;
-                    Tools.outputSolutionPath(currentContainer, parentMap, elapsedTime,i);
-                    return;
-                }
-                String stateHash = currentContainer.toString();
-                if (!closedSet.contains(stateHash)) {
-                    closedSet.add(stateHash);
-                }
-                openSet.remove(currentContainer.hashCode());
-                neighbors = Tools.generateNeighbors(currentContainer);
-                Tools.updateOpenSet(openSet, closedSet, neighbors);
-                // for (int k = 0; k<neighbors.size(); k++)
-                //     parentMap.put(neighbors.get(k), currentContainer);
-            }
-            long endTime = System.currentTimeMillis();
-            long elapsedTime = endTime - startTime;
-            System.out.println("No solution found. Time elapsed: " + elapsedTime + " milliseconds In "+i+" itaretions.");
-            return;
+        long endTime = System.currentTimeMillis();
+        long elapsedTime = endTime - startTime;
+        System.out.println("No solution found. Time elapsed: " + elapsedTime + " milliseconds In "+i+" itaretions.");
+        return;
     }
 }
 
