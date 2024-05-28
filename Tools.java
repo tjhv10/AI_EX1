@@ -84,6 +84,47 @@ public class Tools {
         }
         return heuristicValue - res.length+1;
     }
+
+
+    // public static int calculateHeuristic(Container container) {
+    //     int misplaced = 0;
+    //     int emptyTubes = 0;
+    //     int correctTubes = 0;
+    //     int perfectTubes = 0;
+    //     int heuristicValue = 0;
+
+    //     int[][] state = container.getLevels();
+    //     int numColors = container.getNumOfColors();
+        
+    //     for (int[] tube : state) {
+    //         if (top(tube) == -1) {
+    //             emptyTubes++;
+    //             continue;
+    //         }
+    //         int correctColor = tube[tube.length - 1];
+    //         for (int i = tube.length - 1; i >= 0; i--) {
+    //             if (tube[i] != -1) {
+    //                 correctColor = tube[i];
+    //                 break;
+    //             }
+    //         }
+    //         boolean allSameColor = true;
+    //         for (int color : tube) {
+    //             if (color != correctColor) {
+    //                 misplaced++;
+    //                 allSameColor = false;
+    //             }
+    //         }
+    //         if (allSameColor) {
+    //             correctTubes++;
+    //             if (tube.length > numColors / 2) {
+    //                 perfectTubes++;
+    //             }                
+    //         }
+    //     }
+    //     heuristicValue = (emptyTubes * 5) + (correctTubes * 5) - (misplaced * 2) + (perfectTubes * 5);
+    //     return -1*heuristicValue;
+    // }
     public static void print2DArray(int[][] array) {
         for (int i = 0; i < array.length; i++) {
             for (int j = 0; j < array[i].length; j++) {
@@ -353,7 +394,7 @@ public class Tools {
         while (!openSet.isEmpty()) {
             i++;
             Container currentContainer = Tools.getMinCostContainer(openSet);
-            // System.out.println(currentContainer.getHeuristic()+currentContainer.getSteps());
+            // System.out.println("h: "+currentContainer.getHeuristic()+" s: "+currentContainer.getSteps());
             if (Tools.isGoalState(currentContainer)) {
                 long endTime = System.currentTimeMillis();
                 long elapsedTime = endTime - startTime;
