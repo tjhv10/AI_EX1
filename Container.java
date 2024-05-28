@@ -37,7 +37,7 @@ public class Container {
         for (int i = 0; i < numRows; i++) {
             System.arraycopy(other.levels[i], 0, this.levels[i], 0, numCols);
         }
-        hueristic = Tools.calculateHeuristic(other);
+        hueristic = other.hueristic;
         numOfColoers = other.numOfColoers;
     }
     public int[][] getLevels() {

@@ -67,6 +67,7 @@ public class Tools {
         int color;
         for (int i = 0; i < c.getLevels().length; i++) {
             if (top(c.getLevels()[i])!=-1) {
+                heuristicValue++;
                 for (int j = c.getLevels()[i].length-1; j > top(c.getLevels()[i]); j--) {
                     color = c.getLevels()[i][j];
                     while (c.getLevels()[i][j-1]==color) {
@@ -81,13 +82,7 @@ public class Tools {
         for (int i = 0; i < res.length; i++) {
             heuristicValue += res[i];
         }
-        for (int i = 1; i < c.getLevels().length; i++) {
-            if (top(c.getLevels()[i])!=-1) {
-                heuristicValue++;
-            }
-        }
-        heuristicValue-=res.length-2;
-        return heuristicValue;
+        return heuristicValue - res.length-2;
     }
     public static void print2DArray(int[][] array) {
         for (int i = 0; i < array.length; i++) {
@@ -375,7 +370,7 @@ public class Tools {
             while (!openSet.isEmpty()) {
                 i++;
                 Container currentContainer = Tools.getMinCostContainer(openSet);
-                // System.out.println(currentContainer.getHeuristic());
+                System.out.println(currentContainer.getHeuristic());
                 if (Tools.isGoalState(currentContainer)) {
                     long endTime = System.currentTimeMillis();
                     long elapsedTime = endTime - startTime;
@@ -388,15 +383,9 @@ public class Tools {
                 }
                 openSet.remove(currentContainer.hashCode());
                 neighbors = Tools.generateNeighbors(currentContainer);
-                if (openSet.size()>1000) {
-                    openSet = sortAndFilterContainers(openSet);
-                }
                 Tools.updateOpenSet(openSet, closedSet, neighbors);
-                neighbors.sort(Comparator.comparingInt(Container::getHeuristic));
-                double size = neighbors.size()/1.8;
-                for (int k = 0; k<size; k++) {
-                    parentMap.put(neighbors.get(k), currentContainer);
-                }
+                // for (int k = 0; k<neighbors.size(); k++)
+                //     parentMap.put(neighbors.get(k), currentContainer);
             }
             long endTime = System.currentTimeMillis();
             long elapsedTime = endTime - startTime;
