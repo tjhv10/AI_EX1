@@ -98,75 +98,74 @@ public class Tools {
 
         return resultArray;
     }
-    public static int calculateHeuristic(Container container) {
-        int misplaced = 0;
-        int emptyTubes = 0;
-        int correctTubes = 0;
-        int perfectTubes = 0;
-        int heuristicValue = 0;
-
-        int[][] state = container.getLevels();
-        
-        for (int[] tube : state) {
-            if (top(tube)==-1) {
-                emptyTubes++;
-                continue;
-            }
-
-            int correctColor = -1;
-            for (int i = tube.length - 1; i >= 0; i--) {
-                if (tube[i] != -1) {
-                    correctColor = tube[i];
-                    break;
-                }
-            }
-
-            boolean allSameColor = true;
-            for (int color : tube) {
-                if (color != correctColor&&color!=-1) {
-                    misplaced++;
-                    allSameColor = false;
-                }
-            }
-
-            if (allSameColor) {
-                correctTubes++;
-                if (top(tube) < tube.length / 2) {
-                    perfectTubes++;
-                }
-            }
-        }
-
-        heuristicValue = (emptyTubes * 5) + (correctTubes * 5) - (misplaced * 2) + (perfectTubes * 5);
-        return -heuristicValue;
-    }
-    // public static int calculateHeuristic(Container c) {
+    // public static int calculateHeuristic(Container container) {
+    //     int misplaced = 0;
+    //     int emptyTubes = 0;
+    //     int correctTubes = 0;
+    //     int perfectTubes = 0;
     //     int heuristicValue = 0;
-    //     int[] res = new int[c.getNumOfColors()];
-    //     int color,top;
-    //     int [][] levels = c.getLevels();
-    //     for (int i = 0; i < levels.length; i++) {
-    //         top = top(levels[i]);
 
-    //         if (top!=-1) {
-    //             // heuristicValue+=2;
-    //             for (int j = levels[i].length-1; j > top; j--) {
-    //                 color = levels[i][j];
-    //                 while (levels[i][j-1]==color) {
-    //                     j--;
-    //                     if(j==0)
-    //                     break;
-    //                 }
-    //                 res[color] += j - top;
+    //     int[][] state = container.getLevels();
+        
+    //     for (int[] tube : state) {
+    //         if (top(tube)==-1) {
+    //             emptyTubes++;
+    //             continue;
+    //         }
+
+    //         int correctColor = -1;
+    //         for (int i = tube.length - 1; i >= 0; i--) {
+    //             if (tube[i] != -1) {
+    //                 correctColor = tube[i];
+    //                 break;
+    //             }
+    //         }
+
+    //         boolean allSameColor = true;
+    //         for (int color : tube) {
+    //             if (color != correctColor&&color!=-1) {
+    //                 misplaced++;
+    //                 allSameColor = false;
+    //             }
+    //         }
+
+    //         if (allSameColor) {
+    //             correctTubes++;
+    //             if (top(tube) < tube.length / 2) {
+    //                 perfectTubes++;
     //             }
     //         }
     //     }
-    //     for (int i = 0; i < res.length; i++) {
-    //         heuristicValue += res[i];
-    //     }
-    //     return heuristicValue;
-    //     //  - res.length*2;
+
+    //     heuristicValue = (emptyTubes * 5) + (correctTubes * 5) - (misplaced * 2) + (perfectTubes * 5);
+    //     return -heuristicValue;
     // }
+    public static int calculateHeuristic(Container c) {
+        int heuristicValue = 0;
+        int[] res = new int[c.getNumOfColors()];
+        int color,top;
+        int [][] levels = c.getLevels();
+        for (int i = 0; i < levels.length; i++) {
+            top = top(levels[i]);
+
+            if (top!=-1) {
+                heuristicValue+=2;
+                for (int j = levels[i].length-1; j > top; j--) {
+                    color = levels[i][j];
+                    while (levels[i][j-1]==color) {
+                        j--;
+                        if(j==0)
+                        break;
+                    }
+                    res[color] += j - top;
+                }
+            }
+        }
+        for (int i = 0; i < res.length; i++) {
+            heuristicValue += res[i];
+        }
+        return heuristicValue - res.length*2;
+    }
     
     public static void print2DArray(int[][] array) {
         for (int i = 0; i < array.length; i++) {
@@ -325,18 +324,19 @@ public class Tools {
         return arr;
     }
 
-    public static void updateOpenSet(Hashtable<Integer, Container> openSet, Set<String> closedSet, List<Container> neighbors) {
+    public static void updateOpenSet(Hashtable<String, Container> openSet, Set<String> closedSet, List<Container> neighbors) {
         for (Container neighborContainer : neighbors) {
             String neighborStateHash = neighborContainer.toString();
-            int neighborHashCode = neighborContainer.hashCode();
+            String neighborHashCode = neighborContainer.toString();
             // Check if the neighbor is not in the closed set and not already in the open set
             if (!closedSet.contains(neighborStateHash)&& !openSet.containsKey(neighborHashCode))
-                openSet.put(neighborContainer.hashCode(), neighborContainer);
+                openSet.put(neighborContainer.toString(), neighborContainer);
         }
+        
     }
 
     // Helper method to get the container with the minimum total cost from the open set
-    public static Container getMinCostContainer(Hashtable<Integer, Container> openSet) {
+    public static Container getMinCostContainer(Hashtable<String, Container> openSet) {
         Container minContainer = null;
         double f;
         double minVal = Double.MAX_VALUE;
@@ -450,15 +450,16 @@ public class Tools {
     public static void solvePuzzle(Container initialContainer) {
         int i =0;
         List<Container> neighbors =null;
-        Hashtable<Integer, Container> openSet = new Hashtable<>();
+        Hashtable<String, Container> openSet = new Hashtable<>();
         Set<String> closedSet = new HashSet<>();
         Map<Container, Container> parentMap = new HashMap<>();
-        openSet.put(initialContainer.hashCode(), initialContainer);
+        openSet.put(initialContainer.toString(), initialContainer);
         long startTime = System.nanoTime();
         while (!openSet.isEmpty()) {
             i++;
             Container currentContainer = Tools.getMinCostContainer(openSet);
             // System.out.println("h: "+currentContainer.getHeuristic()+" s: "+currentContainer.getSteps());
+            // System.out.println(openSet.size());
             if (Tools.isGoalState(currentContainer)) {
                 long endTime = System.nanoTime();
                 long elapsedTime = endTime - startTime;
@@ -470,7 +471,7 @@ public class Tools {
             if (!closedSet.contains(stateHash)) {
                 closedSet.add(stateHash);
             }
-            openSet.remove(currentContainer.hashCode());
+            openSet.remove(currentContainer.toString());
             neighbors = Tools.generateNeighbors(currentContainer);
             // System.out.println(neighbors.size());
             // if (openSet.size()>1000) {

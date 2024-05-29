@@ -29,7 +29,7 @@ Puzzle has been solved in 360 steps in 0.1725633 seconds in 363 itaretions.
 Puzzle 14:
 Puzzle has been solved in 367 steps in 0.378782201 seconds in 369 itaretions.
 Puzzle 15:
-Cant solve.
+Puzzle has been solved in 2277 steps in 3.4656101 minutes in 47789 itaretions.
 Puzzle 16:
 Puzzle has been solved in 2437 steps in 7.5760274 seconds in 2463 itaretions.
 Puzzle 17:
