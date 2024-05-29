@@ -1,0 +1,40 @@
+Puzzle 0:
+Puzzle has been solved in 5 steps in 0.00004.76399 seconds in 8 itaretions.
+Puzzle 1:
+Puzzle has been solved in 11 steps in 0.00007.356 seconds in 12 itaretions.
+Puzzle 2:
+Puzzle has been solved in 11 steps in 0.00007.488 seconds in 20 itaretions.
+Puzzle 3:
+Puzzle has been solved in 21 steps in 0.0015454 seconds in 23 itaretions.
+Puzzle 4:
+Puzzle has been solved in 22 steps in 0.0013449 seconds in 24 itaretions.
+Puzzle 5:
+Puzzle has been solved in 27 steps in 0.001754099 seconds in 28 itaretions.
+Puzzle 6:
+Puzzle has been solved in 32 steps in 0.001937099 seconds in 34 itaretions.
+Puzzle 7:
+Puzzle has been solved in 50 steps in 0.0061884 seconds in 116 itaretions.
+Puzzle 8:
+Puzzle has been solved in 48 steps in 0.0213127 seconds in 855 itaretions.
+Puzzle 9:
+Puzzle has been solved in 60 steps in 0.003382301 seconds in 137 itaretions.
+Puzzle 10:
+Puzzle has been solved in 88 steps in 0.0291657 seconds in 1099 itaretions.
+Puzzle 11:
+Puzzle has been solved in 87 steps in 0.017074601 seconds in 89 itaretions.
+Puzzle 12:
+Puzzle has been solved in 338 steps in 0.4547212 seconds in 4679 itaretions.
+Puzzle 13:
+Puzzle has been solved in 360 steps in 0.1725633 seconds in 363 itaretions.
+Puzzle 14:
+Puzzle has been solved in 367 steps in 0.378782201 seconds in 369 itaretions.
+Puzzle 15:
+Cant solve.
+Puzzle 16:
+Puzzle has been solved in 2437 steps in 7.5760274 seconds in 2463 itaretions.
+Puzzle 17:
+Puzzle has been solved in 2453 steps in 30.968107 seconds in 2456 itaretions.
+Puzzle 18:
+Puzzle has been solved in 8402 steps in 5.58437985 minutes in 8409 itaretions.
+Puzzle 19:
+Puzzle has been solved in 9349 steps in 16.9222025 minutes in 9354 itaretions.

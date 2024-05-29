@@ -28,7 +28,7 @@ public class Container {
         this.levels = levels;
         this.numOfColors = numOfColors();
         this.heuristic = Tools.calculateHeuristic(this);
-        this.steps = 0; // Initialize steps to 0
+        this.steps = 0;
     }
     public Container(int[][] levels, int steps, int heuristic, int numOfColers) {
         this.levels = levels;
