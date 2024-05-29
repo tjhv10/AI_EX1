@@ -8,6 +8,8 @@ import java.util.*;
 public class Tools {
     public static int top(int[] arr)
     {
+        if(arr[arr.length-1]==-1)
+            return -1;
         boolean flag= false;
         if(arr[0]==-1)
             flag = true;
