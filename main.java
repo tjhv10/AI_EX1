@@ -6,17 +6,23 @@ public class Main {
         String filePath = "instences.txt";
         try {
             List<String> initRows = Tools.extractInitRows(filePath);
-            int i = 0;
-            for (String initRow : initRows) {
+            for (int j = 0; j < 100; j++) {
+            int i = 16;
+            while (i<20)
+            {
+
                 System.out.println("Puzzle "+i+":");
+                int[][] superHardstate = Tools.convertStringTo2DArray(initRows.get(i));
                 i++;
-                int[][] superHardstate = Tools.convertStringTo2DArray(initRow);
                 Container c = new Container(superHardstate);
                 Tools.solvePuzzle(c);
+                System.gc();
             }
+        }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    
     }
 }    
 

@@ -144,7 +144,6 @@ public class Tools {
         }
         return result;
     }
-    // Generate neighboring states from the current state (container)
     public static List<Container> generateNeighbors(Container currentContainer) {
         List<Container> neighbors = new ArrayList<>();
         int numContainersStart = currentContainer.getLevels().length;
@@ -152,7 +151,6 @@ public class Tools {
         currentContainer = new Container(filterArrays(currentContainer.getLevels()),currentContainer.getSteps(),currentContainer.getHeuristic(),currentContainer.getNumOfColors());
 
         int numContainers = currentContainer.getLevels().length;
-        // Try pouring from each container to all other containers
         for (int from = 0; from < numContainers; from++) {
             for (int to = 0; to < numContainers; to++) {
                 if (from!=to&&isValidMove(from, to, currentContainer.getLevels())) {
@@ -167,67 +165,9 @@ public class Tools {
         }
         return neighbors;
     }
-    // Check if two containers are equal
-    // public static boolean containersEqual(Container container1, Container container2) {
-    //     int[][] levels1 = container1.getLevels();
-    //     int[][] levels2 = container2.getLevels();
-
-    //     // Check if the levels in each container are equal
-    //     for (int i = 0; i < levels1.length; i++) {
-    //         if (levels1[i][0] != levels2[i][0] || levels1[i][1] != levels2[i][1]) {
-    //             return false;
-    //         }
-    //     }
-    //     return true;
-    // }
-    // public static boolean arraysEqual(int[] arr1, int[] arr2) {
-    //     // Check each element of the arrays
-    //     for (int i = 0; i < arr1.length; i++) {
-    //         if (arr1[i] != arr2[i]) {
-    //             return false; // Arrays are not equal if any elements differ
-    //         }
-    //     }
-
-    //     return true;
-    // }
-// Helper method to output the solution path
     public static void outputSolutionPath(Container goalContainer, Map<Container, Container> parentMap, long elapsedTime,int i) {
-    //     List<String> path = new ArrayList<>();
-    //     Container current = goalContainer;
-    //     while (current != null) {
-    //         Container parent = parentMap.get(current);
-    //         if (parent != null) {
-    //             int[][] parentLevels = parent.getLevels();
-    //             int[][] currentLevels = current.getLevels();
-    //             int[] diffIndex = findDifferentLevelIndex(parentLevels, currentLevels);
-    //             String action = "Swap container " + diffIndex[0] + " with " + diffIndex[1];
-    //             path.add(action+"\n"+current+'\n');
-    //         }
-    //         current = parent;
-    //     }
-    //     Collections.reverse(path);
-        // System.out.println("Solution path:");
-        // for (String action : path) {
-        //     System.out.println(action);
-        // }
         System.out.println("Puzzle has been solved in " + goalContainer.getSteps() + " steps in " + elapsedTime/1000000000.0 + " seconds in "+i+" itaretions.");
     }
-
-    // Helper method to find the index of the different level between two arrays
-    // public static int[] findDifferentLevelIndex(int[][] levels1, int[][] levels2) {
-    //     int[] arr = new int[2];
-    //     boolean flag = false;
-    //     for (int i = 0; i < levels1.length; i++) {
-    //         if (!Tools.arraysEqual(levels1[i],levels2[i])&&flag==false) {
-    //             arr[0] = i+1;
-    //             flag = true;
-    //         }
-    //         if (!Tools.arraysEqual(levels1[i],levels2[i])&&flag==true) {
-    //             arr[1] = i+1;
-    //         }
-    //     }
-    //     return arr;
-    // }
     public static void updateOpenSet(Hashtable<String, Container> openSet, Set<String> closedSet, List<Container> neighbors) {
         for (Container neighborContainer : neighbors) {
             String neighborStateHash = neighborContainer.toString();
@@ -249,17 +189,13 @@ public class Tools {
         return minContainer;
     }
     public static int[][] convertStringTo2DArray(String input) {
-        // Split the input string into individual arrays
         String[] arrayStrings = input.split("\\],\\[");
-
-        // Create a 2D array with the maximum length found in the string
         int maxLength = 0;
         for (String arrayString : arrayStrings) {
             String[] elements = arrayString.replaceAll("[\\[\\]]", "").split(",");
             maxLength = Math.max(maxLength, elements.length);
         }
         int[][] result = new int[arrayStrings.length][maxLength];
-        // Fill the array with values from the string
         for (int i = 0; i < arrayStrings.length; i++) {
             String[] elements = arrayStrings[i].replaceAll("[\\[\\]]", "").split(",");
             int[] intElements = new int[elements.length];
@@ -321,6 +257,27 @@ public class Tools {
         }
         return "";
     }
+    public static Hashtable<String, Container> sortAndFilterContainers(Hashtable<String, Container> openSet) {
+        // Convert the Hashtable values to a List
+        List<Map.Entry<String, Container>> entryList = new ArrayList<>(openSet.entrySet());
+
+        // Sort the list based on the heuristic value in descending order
+        entryList.sort((e1, e2) -> Integer.compare(e2.getValue().getHeuristic()+e2.getValue().getSteps(), e1.getValue().getHeuristic()+e1.getValue().getSteps()));
+
+        // Calculate the number of containers to keep (1/4 of the total number)
+        int numberToKeep = entryList.size() / 4;
+
+        // Filter the containers, keeping the 1/4 with the lowest heuristic values
+        List<Map.Entry<String, Container>> filteredEntries = entryList.subList(entryList.size() - numberToKeep, entryList.size());
+
+        // Create a new Hashtable to store the filtered containers
+        Hashtable<String, Container> filteredOpenSet = new Hashtable<>();
+        for (Map.Entry<String, Container> entry : filteredEntries) {
+            filteredOpenSet.put(entry.getKey(), entry.getValue());
+        }
+
+        return filteredOpenSet;
+    }
     public static void solvePuzzle(Container initialContainer) {
         int i =0;
         List<Container> neighbors =null;
@@ -342,6 +299,9 @@ public class Tools {
             if (!closedSet.contains(stateHash)) {
                 closedSet.add(stateHash);
             }
+            if (openSet.size()>1000) {
+                openSet = sortAndFilterContainers(openSet);
+            }
             openSet.remove(currentContainer.toString());
             neighbors = Tools.generateNeighbors(currentContainer);
             Tools.updateOpenSet(openSet, closedSet, neighbors);
@@ -352,4 +312,3 @@ public class Tools {
         return;
     }
 }
-
