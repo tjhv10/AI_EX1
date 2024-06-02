@@ -74,7 +74,6 @@ public class Tools {
         int [][] levels = c.getLevels();
         for (int i = 0; i < levels.length; i++) {
             top = top(levels[i]);
-
             if (top!=-1) {
                 heuristicValue+=2;
                 for (int j = levels[i].length-1; j > top; j--) {
@@ -91,7 +90,7 @@ public class Tools {
         for (int i = 0; i < res.length; i++) {
             heuristicValue += res[i];
         }
-        return heuristicValue - res.length*2;
+        return heuristicValue - (res.length*2);
     }
     public static void print2DArray(int[][] array) {
         for (int i = 0; i < array.length; i++) {
@@ -147,16 +146,14 @@ public class Tools {
     public static List<Container> generateNeighbors(Container currentContainer) {
         List<Container> neighbors = new ArrayList<>();
         int numContainersStart = currentContainer.getLevels().length;
-        
         currentContainer = new Container(filterArrays(currentContainer.getLevels()),currentContainer.getSteps(),currentContainer.getHeuristic(),currentContainer.getNumOfColors());
-
         int numContainers = currentContainer.getLevels().length;
         for (int from = 0; from < numContainers; from++) {
             for (int to = 0; to < numContainers; to++) {
                 if (from!=to&&isValidMove(from, to, currentContainer.getLevels())) {
                     Container neighbor = new Container(currentContainer);
                     performMove(from, to, neighbor);
-                    neighbor.setLevels(addNewArrays(neighbor.getLevels(), numContainersStart-numContainers));
+                    neighbor.setLevels(addNewArrays(neighbor.getLevels(), numContainersStart - numContainers));
                     neighbor.setSteps(currentContainer.getSteps()+1);
                     neighbor.setHeuristic(Tools.calculateHeuristic(neighbor));
                     neighbors.add(neighbor);
@@ -258,24 +255,15 @@ public class Tools {
         return "";
     }
     public static Hashtable<String, Container> sortAndFilterContainers(Hashtable<String, Container> openSet) {
-        // Convert the Hashtable values to a List
         List<Map.Entry<String, Container>> entryList = new ArrayList<>(openSet.entrySet());
-
-        // Sort the list based on the heuristic value in descending order
         entryList.sort((e1, e2) -> Integer.compare(e2.getValue().getHeuristic()+e2.getValue().getSteps(), e1.getValue().getHeuristic()+e1.getValue().getSteps()));
-
-        // Calculate the number of containers to keep (1/4 of the total number)
         int numberToKeep = entryList.size() / 4;
-
-        // Filter the containers, keeping the 1/4 with the lowest heuristic values
         List<Map.Entry<String, Container>> filteredEntries = entryList.subList(entryList.size() - numberToKeep, entryList.size());
-
-        // Create a new Hashtable to store the filtered containers
         Hashtable<String, Container> filteredOpenSet = new Hashtable<>();
+
         for (Map.Entry<String, Container> entry : filteredEntries) {
             filteredOpenSet.put(entry.getKey(), entry.getValue());
         }
-
         return filteredOpenSet;
     }
     public static void solvePuzzle(Container initialContainer) {
@@ -299,7 +287,7 @@ public class Tools {
             if (!closedSet.contains(stateHash)) {
                 closedSet.add(stateHash);
             }
-            if (openSet.size()>1000) {
+            if (openSet.size()>10000) {
                 openSet = sortAndFilterContainers(openSet);
             }
             openSet.remove(currentContainer.toString());

@@ -7,22 +7,20 @@ public class Main {
         try {
             List<String> initRows = Tools.extractInitRows(filePath);
             for (int j = 0; j < 100; j++) {
-            int i = 16;
+            int i = 0;
             while (i<20)
             {
 
                 System.out.println("Puzzle "+i+":");
-                int[][] superHardstate = Tools.convertStringTo2DArray(initRows.get(i));
+                int[][] state = Tools.convertStringTo2DArray(initRows.get(i));
                 i++;
-                Container c = new Container(superHardstate);
+                Container c = new Container(state);
                 Tools.solvePuzzle(c);
-                System.gc();
             }
         }
         } catch (IOException e) {
             e.printStackTrace();
         }
-    
     }
 }    
 

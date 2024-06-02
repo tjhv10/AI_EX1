@@ -5,9 +5,8 @@ public class Container {
     private int[][] levels;
     private int heuristic;
     private int numOfColors;
-    private int steps; // New variable to store the number of steps
+    private int steps; 
 
-    // Method to calculate the number of colors
     public int numOfColors() {
         HashSet<Integer> set = new HashSet<>();
         for (int[] row : levels) {
@@ -18,12 +17,10 @@ public class Container {
         return set.size();
     }
 
-    // Getter for numOfColors
     public int getNumOfColors() {
         return numOfColors;
     }
 
-    // Constructor with levels parameter
     public Container(int[][] levels) {
         this.levels = levels;
         this.numOfColors = numOfColors();
@@ -36,7 +33,6 @@ public class Container {
         this.heuristic = heuristic;
         this.steps = steps;
     }
-    // Default constructor
     public Container() {
         this.levels = new int[0][0];
         this.heuristic = 0;
@@ -44,7 +40,6 @@ public class Container {
         this.steps = 0;
     }
 
-    // Copy constructor
     public Container(Container other) {
         int numRows = other.levels.length;
         int numCols = other.levels[0].length;
@@ -57,37 +52,30 @@ public class Container {
         this.steps = other.steps;
     }
 
-    // Getter for levels
     public int[][] getLevels() {
         return levels;
     }
 
-    // Setter for levels
     public void setLevels(int[][] levels) {
         this.levels = levels;
     }
 
-    // Getter for heuristic
     public int getHeuristic() {
         return heuristic;
     }
 
-    // Setter for heuristic
     public void setHeuristic(int val) {
         this.heuristic = val;
     }
 
-    // Getter for steps
     public int getSteps() {
         return steps;
     }
 
-    // Setter for steps
     public void setSteps(int steps) {
         this.steps = steps;
     }
 
-    // Override toString method
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -95,6 +83,5 @@ public class Container {
             sb.append(Arrays.toString(row)).append("\n");
         }
         return sb.toString();
-        //  + "Heuristic value: " + heuristic + "\nSteps: " + steps;
     }
 }
